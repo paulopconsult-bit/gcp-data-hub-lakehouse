@@ -8,7 +8,7 @@ on:
       - 'dockerfile'
       - '.github/workflows/deploy.yml'
 
-# Evita conflitos de deploys simultâneos
+# Evita conflitos de deploys simultâneos para a mesma branch(main ou dev)
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
