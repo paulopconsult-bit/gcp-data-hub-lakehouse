@@ -1,0 +1,45 @@
+name: Deploy Lakehouse GCP
+
+on:
+  push:
+    branches: [ "main", "dev" ] # Dispara o robô ao salvar nessas branches
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Autenticar no Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configurar CLI do Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configurar Docker para Artifact Registry
+        run: |
+          gcloud auth configure-docker southamerica-east1-docker.pkg.dev
+
+      - name: Definir Variáveis por Ambiente (Dev vs Prod)
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "GCP_PROJECT=prd-data-hub" >> $GITHUB_ENV
+            echo "GCP_JOB=lakehouse-prod-cliente" >> $GITHUB_ENV
+          else
+            echo "GCP_PROJECT=prd-data-hub-dev" >> $GITHUB_ENV
+            echo "GCP_JOB=lakehouse-00-cliente" >> $GITHUB_ENV
+          fi
+
+      - name: Build e Push da Imagem Docker
+        run: |
+          IMAGE_NAME="southamerica-east1-docker.pkg.dev/${{ env.GCP_PROJECT }}/repo-lakehouse-cliente/lakehouse-00-cliente:${{ github.sha }}"
+          docker build -t $IMAGE_NAME -f 00-Scripts/00-cliente/dockerfile .
+          docker push $IMAGE_NAME
+
+      - name: Atualizar o Cloud Run Job
+        run: |
+          IMAGE_NAME="southamerica-east1-docker.pkg.dev/${{ env.GCP_PROJECT }}/repo-lakehouse-cliente/lakehouse-00-cliente:${{ github.sha }}"
+          gcloud run jobs update ${{ env.GCP_JOB }} --image $IMAGE_NAME --region southamerica-east1 --project ${{ env.GCP_PROJECT }}
