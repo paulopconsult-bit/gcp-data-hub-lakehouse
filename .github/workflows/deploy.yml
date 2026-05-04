@@ -35,7 +35,7 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "GCP_PROJECT=prd-data-hub-v1" >> $GITHUB_ENV
-            echo "GCP_JOB=lakehouse-prod-cliente" >> $GITHUB_ENV
+            echo "GCP_JOB=job-lakehouse-00-cliente" >> $GITHUB_ENV
           else
             echo "GCP_PROJECT=prd-data-hub-dev" >> $GITHUB_ENV
             echo "GCP_JOB=lakehouse-00-cliente" >> $GITHUB_ENV
