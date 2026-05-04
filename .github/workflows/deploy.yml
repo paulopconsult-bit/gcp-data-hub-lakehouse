@@ -9,6 +9,7 @@ on:
       - '.github/workflows/deploy.yml'
 
 # Evita conflitos de deploys simultâneos para a mesma branch(main ou dev)
+# Se um deploy for iniciado para uma branch, e outro push acontecer para a mesma branch antes do primeiro deploy terminar, o segundo deploy irá cancelar o primeiro e iniciar um novo deploy com o código mais recente.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
