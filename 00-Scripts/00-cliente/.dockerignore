@@ -20,6 +20,7 @@
 # O arquivo "D:\Docker\lakehouse\77-schema-controls\00-cliente\schema-controls.json" é acessado via Script Python, e ele é atualizado com as regras de qualidade definidas.
 # O Docker não vai copiar a pasta 77-schema-controls para dentro da imagem;
 # Por isso é mportante salvar o arquivo schema-controls.json atualizado no storage bucket nesta camada mapeada manualmente no storage/bucket.
+# ignorada para forçar o container a ler o contrato via volume montado no Cloud.
 77-schema-controls/ 
 
 88-logs-execution/
