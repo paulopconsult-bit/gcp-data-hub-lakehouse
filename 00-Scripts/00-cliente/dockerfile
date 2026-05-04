@@ -1,0 +1,35 @@
+# 1. Imagem base oficial do Python (Leve e estável)
+# Simula  "SO/Firmware", a imagem é o "Sistema Operacional" do container, ela tem o Python 3.11 pré-instalado e o Linux.
+# Precisa estar online para baixar a imagem na primeira vez que você faz o build, 
+# mas depois disso, o processo é offline, ela fica em Cache Local e você pode buildar offline.
+FROM python:3.11-slim
+# Atualiza os pacotes do Linux para as versões mais seguras. Diminui a vulnerabilidade do container no GCP. 
+# E depois limpa o cache de pacotes para deixar a imagem mais leve.
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
+# 2. Define o diretório de trabalho dentro do container. O "Home" do Container /Simula o "HD"
+# o WORKDIR define o diretório DENTRO do container, não no seu host. 
+# Ele diz: "A partir de agora, todo comando (como o COPY) vai ter como base a pasta /app lá dentro".
+WORKDIR /app
+
+# 3. Copia o instalador de bibliotecas e instala as dependências
+# "requirements.txt" Lista somente bibliotecas de terceiros, sem incluir bibliotecas Standard Library, locais do próprio python
+COPY 00-Scripts/00-cliente/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. Copia os scripts para dentro do container
+# O comando abaixo "achata" a pasta 00-cliente para dentro da raiz /app do container.
+COPY 00-Scripts/00-cliente/ .
+
+# 5. Define a variável de ambiente que o nosso código já entende!
+# ENV (Variável de Ambiente): O Docker "injeta" essa variável dentro do sistema Linux dele. 
+# Quando seu script Python pergunta os.getenv('ROOT_PROJETO'), o Docker responde /app/lakehouse. 
+# Isso ignora qualquer coisa que esteja no seu Windows. É o Isolamento de Ambiente.
+# E no Cloud, o lakehouse será montado (via volume) em /app/lakehouse.
+# O script está em /app, ele acorda e lê ROOT_PROJETO, ele pensa: 
+# "Beleza, os dados que eu preciso processar estão na pasta logo abaixo de mim, chamada lakehouse".
+ENV ROOT_PROJETO=/app/lakehouse
+
+# 6. O comando que dá o "Play" no seu Maestro que deve estar no mesmo diretório dodockerfile, ou seja, dentro do /app do container.
+# Como "achatamos" os scripts para o /app no passo 4, ele executa direto da raiz.
+CMD ["python", "main-orchestrator-cliente.py"]

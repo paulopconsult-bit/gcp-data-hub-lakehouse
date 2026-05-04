@@ -1,0 +1,30 @@
+# 1. Imagem base oficial do Python (Leve e estável)
+# O comando COPY . . continuará no seu Dockerfile, 
+# mas ele agora só vai levar para a imagem a pasta 00-Scripts 
+
+# --- Ignorar Ferramentas de Versão ---
+.git/
+.gitignore
+
+# --- Ignorar Pastas de Dados ---
+01-00-raw/
+02-00-raw-backup/
+02-01-bronze/
+02-02-quarantine-erros/
+02-03-metadata-manifests/
+03-silver-cleaned/
+04-silver-enriched/
+05-gold-business/
+06-quality-reports/
+
+# O arquivo "D:\Docker\lakehouse\77-schema-controls\00-cliente\schema-controls.json" é acessado via Script Python, e ele é atualizado com as regras de qualidade definidas.
+# O Docker não vai copiar a pasta 77-schema-controls para dentro da imagem;
+# Por isso é mportante salvar o arquivo schema-controls.json atualizado no storage bucket nesta camada mapeada manualmente no storage/bucket.
+77-schema-controls/ 
+
+88-logs-execution/
+99-staging-tests/
+
+#O Windows cria um arquivo desktop.ini para cada pasta (devido alteração do icone), 
+# e ele é inútil para o nosso projeto, então vamos ignorar ele também.
+desktop.ini

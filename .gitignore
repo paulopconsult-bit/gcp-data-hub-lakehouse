@@ -1,0 +1,17 @@
+# Ignora todas as camadas de dados e logs
+01-00-raw/
+02-00-raw-backup/
+02-01-bronze/
+02-02-quarantine-erros/
+02-03-metadata-manifests/
+03-silver-cleaned/
+04-silver-enriched/
+05-gold-business/
+06-quality-reports/
+88-logs-execution/
+99-staging-tests/
+
+# Ignora arquivos de sistema e dados soltos
+*.csv
+*.parquet
+desktop.ini
